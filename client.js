@@ -17,7 +17,7 @@ function connect(id) {
 	// This ID is internal only
 	var peer = new Peer(Math.floor(Math.random()*100000), {host: 'sharesphero.azurewebsites.net', port: 80, path: "/share-sphero-broker"});
 	// Connect to the Sphero control server	
-	server = peer.connect(String(id))
+	server = peer.connect(String(id));
 	server.on("open", onConnected);
     server.on("disconnected", onDisconnected);
     server.on("close", onDisconnected);
@@ -37,7 +37,7 @@ function onConnected() {
 
 function onDisconnected() {
 	updateStatus("Disconnected.");
-	// Unhide and enable controls
+	// Hide controls
 	document.getElementById("color-input").style.display = "none";
 }
 
