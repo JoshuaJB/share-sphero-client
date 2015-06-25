@@ -31,19 +31,49 @@ function updateStatus(str) {
 function onConnected() {
 	updateStatus("Connected.");
 	// Unhide and enable controls
-	document.getElementById("color-input").style.display = "inline";
+	document.getElementById("controls").style.display = "inline";
 	document.getElementById("color-input").addEventListener("change", onColorChange);
 }
 
 function onDisconnected() {
 	updateStatus("Disconnected.");
 	// Hide controls
-	document.getElementById("color-input").style.display = "none";
+	document.getElementById("controls").style.display = "none";
 }
 
 function onColorChange() {
 	var color = document.getElementById("color-input").value;
-	// For now, just send the raw color
-	server.send(color);
-	updateStatus("Sent command.");
+    // Encode the color
+    var message = {};
+    message.type = "color";
+    message.color = color;
+	// Send the color
+	server.send(message);
+	updateStatus("Sent color command.");
 }
+
+function onDrive(heading) {
+    var speed = document.getElementById("speed").value;
+    // Encode heading and speed
+    var message = {};
+    message.type = "drive";
+    message.speed = speed;
+    message.heading = heading;
+    // Send message
+    server.send(message);
+    updateStatus("Sent drive command");
+}
+
+function onMessage() {
+	var body = document.getElementById("message").value;
+	var name = document.getElementById("name").value;
+	// Encode message
+	var message = {};
+	message.type = "text";
+	message.body = body;
+	message.from = name;
+	// Send message
+	server.send(message);
+	updateStatus("Sent text message");
+}
+
