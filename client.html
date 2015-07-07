@@ -5,22 +5,32 @@
 	<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
 </head>
 <body>
-	<p>Please enter your connection ID:</p>	
-	<input type="number" id="connection-id" min="0" max="99"/>
-	<button id="entered-connection-id">Enter</button>
+	<div id="setup">
+		<p>Please enter your connection ID:</p>
+		<input type="text" id="connection-id"/>
+		<button id="entered-connection-id">Enter</button>
+	</div>
 	<div id="controls" style="display:none;">
 		<p>Color Controls</p>
-		<input type="color" id="color-input"/>
+		<input type="color" oninput="onColorChange()" id="color"/>
 		<p>Drive Controls</p>
-		<button onchange="onDrive(0)">^^</button>
-		<button onchange="onDrive(90)">>></button>
-		<button onchange="onDrive(180)">vv</button>
-		<button onchange="onDrive(240)"><<</button>
+		<button onclick="onDrive(0)">^^</button>
+		<button onclick="onDrive(90)">>></button>
+		<button onclick="onDrive(180)">vv</button>
+		<button onclick="onDrive(240)"><<</button>
+		<button onclick="onCalibrate()">Calibrate</button>
 		<p>Speed:</p>
-		<input type="number" id="speed"/>
+		<input type="range" id="speed" max="255"/>
+	</div>
+	<div id="calibrate" style="display:none;">
+		<p>Heading</p>
+		<input type="range" id="heading" oninput="onHeadingChange()" max="359"/>
+		<button onclick="onStopCalibrate()">Stop Calibration</button>
+	</div>
+	<div id="chat" style="display:none;">
 		<p>Text Message</p>
-		<input type="text" id="name" placeholder="Your name"/>
-		<input type="text" id="message" placeholder="Your message"/>
+		<div id="messages" style="overflow:auto;height:200px;"></div>
+		<input type="text" inputmode="latin-prose" id="message" placeholder="Your message"/>
 		<button onclick="onMessage()">Send</button>
 	</div>
 	<p id="status">Waiting...</p>
