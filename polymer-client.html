@@ -1,0 +1,113 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Share Sphero Client</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel='import' href="style.html">
+	<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:400,500' type='text/css'>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
+	<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+	<link rel="import" href="bower_components/paper-header-panel/paper-header-panel.html">
+	<link rel="import" href="bower_components/paper-toolbar/paper-toolbar.html">
+	<link rel="import" href="bower_components/paper-material/paper-material.html">
+	<link rel="import" href="bower_components/iron-icons/communication-icons.html">
+	<link rel="import" href="bower_components/iron-icons/av-icons.html">
+	<link rel="import" href="bower_components/iron-icons/hardware-icons.html">
+	<link rel="import" href="bower_components/iron-icons/image-icons.html">
+	<link rel="import" href="custom-icons.html">
+	<link rel="import" href="bower_components/paper-item/paper-icon-item.html">
+	<link rel="import" href="bower_components/paper-styles/paper-styles.html">
+	<link rel="import" href="bower_components/paper-fab/paper-fab.html">
+	<link rel="import" href="bower_components/paper-input/paper-input.html">
+	<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+	<link rel="import" href="bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+	<link rel="import" href="bower_components/paper-button/paper-button.html">
+	<link rel="import" href="bower_components/paper-behaviors/paper-button-behavior.html">
+</head>
+<body class="fit" style="margin:0;">
+	<paper-header-panel>
+		<paper-toolbar>
+			<h1>Share Sphero</h1>
+		</paper-toolbar>
+		<section class="content fit">
+			<styleless-paper-button id="conn">
+				<paper-material class="card">
+					<paper-ripple></paper-ripple>
+					<paper-icon-item class="header-item">
+						<iron-icon icon="communication:present-to-all" item-icon class="header-icon"></iron-icon>
+						<paper-item-body two-line>
+							<h2 id="conn-status">Loading...</h2>
+							<h3 id="conn-info" secondary>Please wait</h3>
+						</paper-item-body>
+					</paper-icon-item>
+				</paper-material>
+			</styleless-paper-button>
+			<styleless-paper-button id="chat">
+				<paper-material class="card">
+					<paper-icon-item class="header-item">
+						<paper-ripple></paper-ripple>
+						<iron-icon icon="communication:chat" item-icon class="header-icon"></iron-icon>
+						<paper-item-body two-line>
+							<h2 id="chat-status">Loading Chat...</h2>
+							<h3 id="chat-recent" secondary>Please wait</h3>
+						</paper-item-body>
+					</paper-icon-item>
+				</paper-material>
+			</styleless-paper-button>
+			<paper-material id="video" class="card">
+				<paper-icon-item class="header-item">
+					<iron-icon icon="av:videocam" item-icon class="header-icon"></iron-icon>
+					<paper-item-body two-line>
+						<h2 id="video-status">Video Unavailable</h2>
+						<h3 id="video-recent" secondary>Coming soon...</h3>
+					</paper-item-body>
+				</paper-icon-item>
+			</paper-material>
+		</section>
+	</paper-header-panel>
+	<paper-dialog id="chat-dialog">
+		<h2>Chat</h2>
+		<paper-dialog-scrollable>
+			<p id="chat-dialog-content"></p>
+		</paper-dialog-scrollable>
+		<paper-input id="chat-dialog-input"></paper-input>
+		<div class="buttons">
+			<paper-button dialog-dismiss>Close</paper-button>
+			<paper-button id="chat-dialog-send">Send</paper-button>
+		</div>
+	</paper-dialog>
+	<paper-fab id="calibrate" icon="custom:calibrate" class="floating-button" toggles></paper-fab>
+	<div id="calibrate-controls">
+		<paper-fab mini icon="image:rotate-left" style="right:78px;bottom:35px;" class="mini-floating-button calibrate-control"></paper-fab>
+		<paper-fab mini icon="image:rotate-right" style="right:35px;bottom:78px;" class="mini-floating-button calibrate-control"></paper-fab>
+	</div>
+	<paper-fab id="palette" icon="image:palette" class="floating-button" toggles></paper-fab>
+	<div id="color-palette">
+		<paper-fab mini style="right:60px;bottom:-30px;" class="mini-floating-button"></paper-fab>
+		<paper-fab mini style="right:80px;bottom:15px;" class="mini-floating-button"></paper-fab>
+		<paper-fab mini style="right:60px;bottom:60px;" class="mini-floating-button"></paper-fab>
+		<paper-fab mini style="right:15px;bottom:80px;" class="mini-floating-button"></paper-fab>
+		<paper-fab id="color-palette-picker" mini icon="image:palette" style="right:-30px;bottom:60px;" class="mini-floating-button"></paper-fab>
+	</div>
+	<paper-fab id="gamepad" icon="hardware:gamepad" class="floating-button"></paper-fab>
+	<paper-dialog id="prompt" modal>
+		<h2 id="prompt-title"></h2>
+		<paper-input id="prompt-input" autofocus></paper-input>
+		<div class="buttons">
+			<!--<paper-button dialog-dismiss>Cancel</paper-button>-->
+			<paper-button dialog-confirm>Accept</paper-button>
+		</div>
+	</paper-dialog>
+	<script>
+	Polymer({
+		is: "styleless-paper-button",
+		behaviors: [Polymer.PaperButtonBehavior]
+	});
+	</script>
+	<script src="./chat.js"></script>
+	<script src="./color.js"></script>
+	<script src="./calibrate.js"></script>
+	<script src="./gamepad.js"></script>
+	<script src="./client.js"></script>
+</body>
+</html>

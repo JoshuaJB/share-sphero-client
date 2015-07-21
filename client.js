@@ -1,62 +1,92 @@
 /* global Peer */
 "use strict";
 
-var conn = null;
-var name = "";
-document.getElementById("entered-connection-id").addEventListener("click", validateAndConnect);
+var g_connection = null;
+var g_name = "";
+var g_serverid = "";
 
-function validateAndConnect() {
-	// Get ID
-	var id = parseInt(document.getElementById("connection-id").value, 16);
-	// Validate ID
-	if (id != NaN)
-		connect(id);
+// Everything has to load before we use polymer
+window.addEventListener("WebComponentsReady", init, false);
+
+function init() {
+	chatInit(
+		document.getElementById("chat-status"),
+		document.getElementById("chat-recent"),
+		document.getElementById("chat-dialog"),
+		document.getElementById("chat-dialog-content"),
+		document.getElementById("chat-dialog-input"),
+		document.getElementById("chat-dialog-send")
+	);
+	calibrateInit(
+		document.getElementById("calibrate"),
+		document.getElementById("calibrate-controls").getElementsByTagName("paper-fab")[0],
+		document.getElementById("calibrate-controls").getElementsByTagName("paper-fab")[1]
+	);
+	colorInit(
+		document.getElementById("palette"),
+		document.getElementById("color-palette")
+	);
+	gamepadInit(document.getElementById("gamepad"));
+	disableCalibrate();
+	disablePalette();
+	disableGamepad();
+	document.getElementById("conn").addEventListener("click", function(){setupConnection(null);}, false);
+	document.getElementById("chat").addEventListener("click", openChat, false);
+	updateStatus("Ready to Connect", "Tap here to begin");
+}
+
+function setupConnection(id) {
+	if (g_connection)
+		return;
+	if (id) {
+		// Validate ID
+		if (parseInt(id, 16) != NaN && parseInt(id, 16) < 4096)
+			connect(id);
+		else
+			updateStatus("Invalid ID", "Tap here to try again");
+	}
 	else
-		updateStatus("Invalid ID, please try again");
+		prompt("Enter Server ID", "Eg. f5a", setupConnection);
 }
 
 function connect(id) {
-	var localID = Math.floor(Math.random()*65536);
-	if (name == "") {
-		name = prompt("Please enter your name:", "Anon-" + localID.toString(16).toUpperCase());
-		if (name == null)
-			return;
+	if (g_name == "") {
+		prompt("Enter Username", "Eg. John Smith", function(name){g_name = name;connect(id);});
+		return;
 	}
-	updateStatus("Connecting... If this takes too long, make sure you entered the right ID.");
+	g_serverid = id;
+	var localID = Math.floor(Math.random() * 65536);
+	updateStatus("Connecting...", "If this takes too long, make sure you entered the right ID.");
 	// This ID is internal only
-	var peer = new Peer(localID, {host: 'sharesphero.azurewebsites.net', port: 80, path: "/share-sphero-broker"});
+	var peer = new Peer(localID, {host: 'sharesphero.azurewebsites.net', port: 80, path: "/share-sphero-broker", debug: 3});
 	// Connect to the Sphero control server	
-	conn = peer.connect(String(id), {label: name});
-	conn.on("data", updateDisplay);
-	conn.on("open", onConnected);
-    conn.on("close", onDisconnected);
-    conn.on("error", onDisconnected);
+	g_connection = peer.connect(String(parseInt(g_serverid, 16)), {label: g_name});
+	g_connection.on("data", updateDisplay);
+	g_connection.on("open", onConnected);
+	g_connection.on("close", onDisconnected);
+	g_connection.on("error", onDisconnected);
 }
 
-function updateStatus(str) {
-	document.getElementById("status").innerHTML = str;
+// Update the global status, if new status is null no changes are made
+function updateStatus(major, minor) {
+	if (major)
+		document.getElementById("conn-status").innerHTML = major;
+	if (minor)
+		document.getElementById("conn-info").innerHTML = minor;
 }
 
 function onConnected() {
-	updateStatus("Connected.");
+	updateStatus("Connected.", "Connected to server " + String(g_serverid));
 	switchDisplayMode("control");
 }
 
 function onDisconnected() {
-	updateStatus("Disconnected.");
+	g_connection = null;
+	updateStatus("Disconnected.", "Tap here to connect");
 	switchDisplayMode("setup");
 }
 
-function onColorChange() {
-    // Encode the color
-    var message = {};
-    message.type = "color";
-    message.color = document.getElementById("color").value;
-	// Send the color
-	conn.send(message);
-	updateStatus("Sent color command.");
-}
-
+// +++++ DEPRECATED +++++
 function onDrive(heading) {
     // Encode heading and speed
     var message = {};
@@ -64,77 +94,36 @@ function onDrive(heading) {
     message.speed = document.getElementById("speed").value;
     message.heading = heading;
     // Send message
-    conn.send(message);
+    g_connection.send(message);
     updateStatus("Sent drive command");
 }
-
-function onMessage() {
-	// Encode message
-	var message = {};
-	message.type = "text";
-	message.body = document.getElementById("message").value;
-	// Send message
-	conn.send(message);
-	updateStatus("Sent text message");
-}
-
-function onCalibrate() {
-	// Encode message
-	var message = {};
-	message.type = "setmode";
-	message.mode = "calibrate";
-	// Send message
-	conn.send(message);
-	updateStatus("Prepping to calibrate...");
-}
-
-function onStopCalibrate() {
-	// Encode message
-	var message = {};
-	message.type = "setmode";
-	message.mode = "drive";
-	// Send message
-	conn.send(message);
-	updateStatus("Returning to drive mode...");
-}
-
-function onHeadingChange() {
-	// Encode message
-	var message = {};
-	message.type = "heading";
-	message.heading = document.getElementById("heading").value;
-	// Send message
-	conn.send(message);
-	updateStatus("Send calibration command");
-}
+// +++++ END DEPRECATED +++++
 
 function updateDisplay(message) {
 	switch(message.type) {
 		case "setmode":
 			if (message.mode != "calibrate") {
-				switchDisplayMode("control");
-				updateStatus("Controls restored.");
+				stopCalibrateMessage();
+				updateStatus("Controls restored.", null);
 			}
-			else if (message.label == name) {
-				switchDisplayMode("calibrate");
-				updateStatus("Calibrating...");
+			else if (message.label == g_name) {
+				// Ignore
+				updateStatus("Calibrating...", null);
 			}
 			else {
-				switchDisplayMode("locked");
-				updateStatus("Another user is calibrating the Sphero, please wait...");
+				startCalibrateMessage();
+				updateStatus("Another user is calibrating the Sphero, please wait...", null);
 			}
 			break;
 		case "text":
-			document.getElementById("messages").innerHTML += message.label + ": " + message.body + "<br>";
+			addChatMessage(message.label, message.body);
 			break;
 		case "drive":
-			// Do something?
-			break;
 		case "heading":
-			// Ignore, clients do nothing here
+			// Ignore
 			break;
 		case "color":
-			document.getElementById("color").value = message.color;
+			addColorMessage(message.color);
 			break;
 		default:
 			console.warn("Message type '" + message.type + "' not implemented.");
@@ -143,32 +132,35 @@ function updateDisplay(message) {
 
 function switchDisplayMode(displayMode) {
 	switch(displayMode) {
-	case "control":
-		// Only display chat and controls
-		document.getElementById("controls").style.display = "inline";
-		document.getElementById("calibrate").style.display = "none";
-		document.getElementById("setup").style.display = "none";
-		document.getElementById("chat").style.display = "inline";
-		break;
-	case "locked":
-		// Only display chat
-		document.getElementById("controls").style.display = "none";
-		document.getElementById("calibrate").style.display = "none";
-		document.getElementById("setup").style.display = "none";
-		document.getElementById("chat").style.display = "inline";
-		break;
-	case "calibrate":
-		// Only display chat and calibration controls
-		document.getElementById("controls").style.display = "none";
-		document.getElementById("calibrate").style.display = "inline";
-		document.getElementById("setup").style.display = "none";
-		document.getElementById("chat").style.display = "inline";
-		break;
-	default:
-		// Fallback to setup
-		document.getElementById("controls").style.display = "none";
-		document.getElementById("calibrate").style.display = "none";
-		document.getElementById("setup").style.display = "inline";
-		document.getElementById("chat").style.display = "none";
+		case "control":
+			// Enable everything
+			enableCalibrate();
+			enablePalette();
+			enableGamepad();
+			break;
+		case "setup":
+			// Disable everything
+			disableCalibrate();
+			disablePalette();
+			disableGamepad();
+			break;
 	}
+	refreshChat();
+}
+
+function prompt(title, placeholder, callback) {
+	document.getElementById("prompt-title").innerHTML = title;
+	document.getElementById("prompt-input").label = placeholder;
+	var prompt = document.getElementById("prompt");
+	var callbackWReset = function() {
+		// Clear value
+		var val = document.getElementById("prompt-input").value;
+		document.getElementById("prompt-input").value = "";
+		// Clear callbacks
+		prompt.parentNode.replaceChild(prompt.cloneNode(true), prompt);
+		callback(val);
+	};
+	prompt.addEventListener("iron-overlay-closed", callbackWReset, false);
+	prompt.open();
+	document.getElementById("prompt-input").focus();
 }

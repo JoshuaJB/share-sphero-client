@@ -1,0 +1,144 @@
+<style is="custom-style">
+body /deep/ {
+	font-family: 'Roboto', sans-serif;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+.content h2, .content h3{
+	margin: 0;
+}
+h1 {
+	font-size: 18pt/*36pt*/;
+	font-weight: 500;
+}
+h2 {
+	font-size: 15pt/*30pt*/;
+	font-weight: 500;
+}
+h3 {
+	font-size: 11pt/*22pt*/;
+	font-weight: 400;
+}
+.card {
+	padding: 20px;
+	margin-bottom: 30px;
+	overflow: auto;
+	background-color: #FFFFFF;
+}
+.content {
+	padding: 30px;
+	background-color: #BFBFBF;
+}
+.header-item {
+	padding: 0;
+	--paper-item-icon-width: 80px;
+}
+.header-icon {
+	--iron-icon-width: 60px;
+	--iron-icon-height: 60px;
+}
+.hidden {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.floating-button {
+	height: 70px;
+	width: 70px;
+	position: absolute;
+	--paper-fab-disabled-background:#404040;
+	--paper-fab {
+		--iron-icon-width: 65%;
+		--iron-icon-height: 65%;
+	};
+}
+.mini-floating-button {
+	position: absolute;
+	--paper-fab-disabled-background:#404040;
+	--paper-fab {
+		--iron-icon-width: 65%;
+		--iron-icon-height: 65%;
+	};
+}
+#calibrate {
+	right: 45px;
+	bottom: 230px;
+	--paper-fab-background:#FFCC00;
+	--paper-fab-keyboard-focus-background:#FFD633;
+}
+#calibrate-controls {
+	right: 45px;
+	bottom: 230px;
+	position: absolute;
+}
+.calibrate-control {
+	display:none;
+	--paper-fab-background:#FFCC00;
+}
+#palette {
+	right: 45px;
+	bottom: 145px;
+	--paper-fab-background:#669900;
+	--paper-fab-keyboard-focus-background:#85AD33;
+}
+#color-palette {
+	right: 45px;
+	bottom: 145px;
+	position: absolute;
+	display: none;
+}
+#color-palette-picker {
+	color:#000000;
+	--paper-fab-background:#ffffff;
+	--paper-fab-disabled-background:#9E9E9E;
+}
+#gamepad {
+	right: 30px;
+	bottom: 30px;
+	height: 100px;
+	width: 100px;
+	--paper-fab-background:#CC0000;
+	--paper-fab-keyboard-focus-background:#D63333;
+}
+#chat-dialog {
+	position: fixed;
+	left:20px;
+	right:20px;
+}
+#chat-dialog > paper-dialog-scrollable {
+	margin: 0;
+}
+@media (min-width: 660px) {
+	.content {
+		padding-left: 60px;
+		padding-right: 60px;
+	}
+	#calibrate {
+		right: 75px;
+	}
+	#calibrate-controls {
+		right: 75px;
+	}
+	#palette {
+		right: 75px;
+	}
+	#color-palette {
+		right: 75px;
+	}
+	#gamepad {
+		right: 60px;
+	}
+	#chat-dialog {
+		left: 50px;
+		right: 50px;
+	}
+}
+</style>
