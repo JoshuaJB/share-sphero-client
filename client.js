@@ -58,7 +58,7 @@ function connect(id) {
 	var localID = Math.floor(Math.random() * 65536);
 	updateStatus("Connecting...", "If this takes too long, make sure you entered the right ID.");
 	// This ID is internal only
-	var peer = new Peer(localID, {host: 'sharesphero.azurewebsites.net', port: 80, path: "/share-sphero-broker", debug: 3});
+	var peer = new Peer(localID, {key: 'vlup1l2o869a4i', debug: 3});
 	// Connect to the Sphero control server	
 	g_connection = peer.connect(String(parseInt(g_serverid, 16)), {label: g_name});
 	g_connection.on("data", updateDisplay);
